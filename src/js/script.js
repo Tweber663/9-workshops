@@ -12,17 +12,26 @@ const handleRef = {
   bookListHandle: Handlebars.compile(document.querySelector(domRef.bookTemp).innerHTML),
 };
 
-// Modify render function to accept a callback
+// Renders information from data.js file on the sreen
 const render = () => {
 
-
+  //Cycle throught each book obj 
   for (let bookID in dataSource.books) {
-    const HTMLElem = handleRef.bookListHandle(dataSource.books[bookID]);
+    const bookObj = dataSource.books[bookID]
+    
+    //Adding new data to renderd information 
+    //1. Backgroud color rating
+    bookObj.ratingBgc = determineRatingBgc(bookObj.rating); //Callback function ->
+    //2. Precante rating
+    bookObj.ratingWidth = parseInt(Math.round(bookObj.rating).toString().padEnd(2, 0));
+
+    //change data from data.js to html using HB
+    const HTMLElem = handleRef.bookListHandle(bookObj);
+    //change html from HB to DOM elements
     const DOMElem = utils.createDOMFromHTML(HTMLElem); 
+    //Render the DOM element to the html
     document.querySelector(domRef.booksList).appendChild(DOMElem); 
     
-    const retunredGradianet = determineRatingBgc(dataSource.books[bookID].rating);
-    console.log(retunredGradianet);
   }
 };
 
@@ -107,7 +116,6 @@ const renderFilter = (filters) => {
 }
 
 const determineRatingBgc = (rating) => {
-console.log(rating)
   let gradient = '';
     if (rating > 9) {
       gradient = 'linear-gradient(to bottom, #ff0084 0%,#ff0084 100%)'
