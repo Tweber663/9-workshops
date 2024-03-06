@@ -3,6 +3,8 @@ const domRef = {
   booksList: '.books-list', 
   // Handle created template 
   bookTemp: '#template-book',
+  //FIlter refrence
+  filtersRef: '.filters',
 };
 
 const handleRef = {
@@ -24,7 +26,7 @@ const render = (callback) => {
   }
 };
 
-//Respons for adding fav books
+//Respons for adding fav books + prepares filters 
 const initActions = () => {
 
   //Fav book storage
@@ -52,11 +54,39 @@ const initActions = () => {
       favoriteBooks.splice(favoriteBooks[dataId], 1);
     }
     console.log(favoriteBooks);
-
     }
   });
-};
+
+  //Stores info about what filters are currently selected
+  const filters = [];
+
+  const filterList = document.querySelector(domRef.filtersRef);
+  
+  //Event delegation event listener (listenting to wrapper filter list (radios)
+  filterList.addEventListener('change', function(event) {
+  if(event.target.type === 'checkbox' && event.target.checked) {
+    filters.push(event.target.value);
+  } else  if (!event.target.checked){
+    console.log('removed:', event.target.value)
+    let index = filters.indexOf(event.target.value);
+    filters.splice(index, 1);
+  }
+  console.log(filters);
+  })
+}
+
+const renderFilter = () => {
+
+  const library = [];
+
+  for (let bookId of dataSource.books) {
+    //Refrence to individual books
+    const bookref = document.querySelector('[data-id="' + bookId.id + '"]');
+    library.push({bookref: bookref, filter: bookId.details});
+  }
+  console.log(library);
+}
 // Call render with initActions as the callback
 render();
 initActions();
-
+renderFilter();
