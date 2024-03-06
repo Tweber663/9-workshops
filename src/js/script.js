@@ -12,17 +12,17 @@ const handleRef = {
   bookListHandle: Handlebars.compile(document.querySelector(domRef.bookTemp).innerHTML),
 };
 
-
 // Modify render function to accept a callback
-const render = (callback) => {
+const render = () => {
+
+
   for (let bookID in dataSource.books) {
     const HTMLElem = handleRef.bookListHandle(dataSource.books[bookID]);
     const DOMElem = utils.createDOMFromHTML(HTMLElem); 
-    document.querySelector(domRef.booksList).appendChild(DOMElem);  
-  }
-  // Call the callback function after rendering is complete
-  if (typeof callback === 'function') {
-    callback();
+    document.querySelector(domRef.booksList).appendChild(DOMElem); 
+    
+    const retunredGradianet = determineRatingBgc(dataSource.books[bookID].rating);
+    console.log(retunredGradianet);
   }
 };
 
@@ -53,7 +53,7 @@ const initActions = () => {
       //If DOES we slice / remove the exsisting one
       favoriteBooks.splice(favoriteBooks[dataId], 1);
     }
-    console.log(favoriteBooks);
+    determineRatingBgc();
     }
   });
 
@@ -71,22 +71,57 @@ const initActions = () => {
     let index = filters.indexOf(event.target.value);
     filters.splice(index, 1);
   }
-  console.log(filters);
+  renderFilter(filters);
   })
 }
 
-const renderFilter = () => {
+//Responsible for rending filtered
+const renderFilter = (filters) => {
 
-  const library = [];
+  console.log(filters);
 
   for (let bookId of dataSource.books) {
     //Refrence to individual books
-    const bookref = document.querySelector('[data-id="' + bookId.id + '"]');
-    library.push({bookref: bookref, filter: bookId.details});
+
+  const bookref = document.querySelector('[data-id="' + bookId.id + '"]');
+
+   let notSelected = false;
+
+   //We're getting the list of books that have NOT been under given criteria
+    for (let filter of filters) {
+      if (!bookId.details[filter]) {
+        notSelected = true;
+        console.log(bookId)
+      }
+    } //notSelected = true every time loops end with a book NOT matching given ctrieria
+
+    // We enter into second verification process, wehre we tell the computer 
+    // If book has exited with notSelected === true, for sure doesn't match the crtieria
+    // So we hide this book
+    if (notSelected === true) {
+      bookref.classList.add('hidden');
+    } else {
+      bookref.classList.remove('hidden')
+    }
   }
-  console.log(library);
 }
+
+const determineRatingBgc = (rating) => {
+console.log(rating)
+  let gradient = '';
+    if (rating > 9) {
+      gradient = 'linear-gradient(to bottom, #ff0084 0%,#ff0084 100%)'
+    } else if (rating > 8 && rating < 9) {
+      gradient = 'linear-gradient(to bottom, #299a0b 0%, #299a0b 100%)'
+    } else if (rating > 6 && rating <= 8) {
+      gradient = 'linear-gradient(to bottom, #b4df5b 0%,#b4df5b 100%)'
+    } else {
+      gradient = 'linear-gradient(to bottom,  #fefcea 0%, #f1da36 100%);'
+    }
+    return gradient
+}
+
+
 // Call render with initActions as the callback
 render();
 initActions();
-renderFilter();
